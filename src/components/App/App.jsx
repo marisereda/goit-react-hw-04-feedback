@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import {
   BsFillEmojiFrownFill,
   BsFillEmojiNeutralFill,
@@ -18,64 +18,63 @@ const OPTIONS = {
   good: BsFillEmojiSmileFill,
 };
 
-export class App extends Component {
-  state = {
-    bad: 0,
-    neutral: 0,
-    good: 0,
-  };
+export const App = () => {
+  const [bad, setBad] = useState(0);
+  const [neutral, setNeutral] = useState(0);
+  const [good, setGood] = useState(0);
 
-  countTotalFeedback = () => {
-    const { bad, neutral, good } = this.state;
+  const countTotalFeedback = () => {
     return bad + neutral + good;
   };
 
-  countPositiveFeedbackPercentage = () => {
-    return Math.round((this.state.good / this.countTotalFeedback()) * 100);
+  const countPositiveFeedbackPercentage = () => {
+    return Math.round((good / countTotalFeedback()) * 100);
   };
 
-  onLeaveFeedback = name => {
-    this.setState(prevState => ({
-      [name]: prevState[name] + 1,
-    }));
+  const onLeaveFeedback = name => {
+    switch (name) {
+      case 'bad':
+        setBad(bad + 1);
+        break;
+      case 'neutral':
+        setNeutral(neutral + 1);
+        break;
+      case 'good':
+        setGood(good + 1);
+        break;
+      default:
+        return;
+    }
   };
 
-  render() {
-    const { bad, neutral, good } = this.state;
-    return (
-      <Box
-        display="flex"
-        flexWrap="wrap"
-        flexDirection="column"
-        justifyContent="center"
-        alignItems="flex-start"
-        padding={6}
-      >
-        <Section title="Please leave feedback" bgColor={theme.colors.bgLight}>
-          <FeedbackOptions
-            options={OPTIONS}
-            onLeaveFeedback={this.onLeaveFeedback}
-          />
-        </Section>
+  return (
+    <Box
+      display="flex"
+      flexWrap="wrap"
+      flexDirection="column"
+      justifyContent="center"
+      alignItems="flex-start"
+      padding={6}
+    >
+      <Section title="Please leave feedback" bgColor={theme.colors.bgLight}>
+        <FeedbackOptions options={OPTIONS} onLeaveFeedback={onLeaveFeedback} />
+      </Section>
 
-        <Section title="Statistics" bgColor={theme.colors.bgPrimary}>
-          {this.state.bad > 0 ||
-          this.state.neutral > 0 ||
-          this.state.good > 0 ? (
-            <Statistics
-              bad={bad}
-              neutral={neutral}
-              good={good}
-              total={this.countTotalFeedback()}
-              positivePercentage={this.countPositiveFeedbackPercentage()}
-            ></Statistics>
-          ) : (
-            <Notification message="There is no any feedback" />
-          )}
-        </Section>
+      <Section title="Statistics" bgColor={theme.colors.bgPrimary}>
+        {bad > 0 || neutral > 0 || good > 0 ? (
+          <Statistics
+            bad={bad}
+            neutral={neutral}
+            good={good}
+            total={countTotalFeedback()}
+            positivePercentage={countPositiveFeedbackPercentage()}
+          ></Statistics>
+        ) : (
+          <Notification message="There is no any feedback" />
+        )}
+      </Section>
 
-        <GlobalStyle />
-      </Box>
-    );
-  }
-}
+      <GlobalStyle />
+    </Box>
+  );
+};
